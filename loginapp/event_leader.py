@@ -500,7 +500,9 @@ def event_report(event_id):
         volunteers = cursor.fetchall()
 
     return render_template('event_leader/event_report.html',
-                         report=report, volunteers=volunteers)
+                         report=report, 
+                         volunteers=volunteers,
+                         event_id=event_id)  # Add this line to explicitly pass event_id)
 
 @app.route('/event_leader/browse_events', endpoint='leader_browse_events')
 def leader_browse_events():
