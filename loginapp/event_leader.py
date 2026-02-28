@@ -501,3 +501,56 @@ def event_report(event_id):
 
     return render_template('event_leader/event_report.html',
                          report=report, volunteers=volunteers)
+
+@app.route('/event_leader/browse_events', endpoint='leader_browse_events')
+def leader_browse_events():
+    """Event Leader browse all upcoming events."""
+    check = event_leader_required()
+    if check:
+        return check
+
+    # Get filter parameters
+    date_filter = request.args.get('date', '')
+    location_filter = request.args.get('location', '')
+    type_filter = request.args.get('type', '')
+
+    query = '''
+        SELECT e.event_id, e.event_name, e.location, e.event_type,
+               e.event_date, e.start_time, e.end_time, e.duration,
+               e.description, e.supplies, e.safety_instructions,
+               u.full_name as leader_name,
+               (SELECT COUNT(*) FROM eventregistrations WHERE event_id = e.event_id) as registered_count
+        FROM events e
+        JOIN users u ON e.event_leader_id = u.user_id
+        WHERE e.event_date >= CURRENT_DATE
+    '''
+    params = []
+
+    if date_filter:
+        query += " AND e.event_date = %s"
+        params.append(date_filter)
+    
+    if location_filter:
+        query += " AND e.location ILIKE %s"
+        params.append(f'%{location_filter}%')
+    
+    if type_filter:
+        query += " AND e.event_type ILIKE %s"
+        params.append(f'%{type_filter}%')
+
+    query += " ORDER BY e.event_date;"
+
+    with db.get_cursor() as cursor:
+        cursor.execute(query, tuple(params))
+        events = cursor.fetchall()
+
+        # Get unique event types for filter dropdown
+        cursor.execute('SELECT DISTINCT event_type FROM events WHERE event_type IS NOT NULL;')
+        event_types = cursor.fetchall()
+
+    return render_template('event_leader/browse_events.html', 
+                         events=events, 
+                         event_types=event_types,
+                         date_filter=date_filter,
+                         location_filter=location_filter,
+                         type_filter=type_filter)
