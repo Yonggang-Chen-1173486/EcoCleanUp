@@ -467,3 +467,55 @@ def admin_view_event(event_id):
     return render_template('admin/event_details.html',
                          event=event, volunteers=volunteers,
                          outcomes=outcomes, feedback_list=feedback_list)
+
+@app.route('/admin/event_report/<int:event_id>', endpoint='admin_event_report')
+def admin_event_report(event_id):
+    """Admin generate detailed report for a specific event."""
+    check = admin_required()
+    if check:
+        return check
+
+    with db.get_cursor() as cursor:
+        cursor.execute('''
+            SELECT e.*, u.full_name as leader_name,
+                   (SELECT COUNT(*) FROM eventregistrations WHERE event_id = e.event_id) as total_registered,
+                   (SELECT COUNT(*) FROM eventregistrations WHERE event_id = e.event_id AND attendance = 'attended') as total_attended,
+                   eo.num_attendees, eo.bags_collected, eo.recyclables_sorted, eo.other_achievements,
+                   (SELECT AVG(rating)::numeric(10,2) FROM feedback WHERE event_id = e.event_id) as avg_rating,
+                   (SELECT COUNT(*) FROM feedback WHERE event_id = e.event_id) as feedback_count
+            FROM events e
+            JOIN users u ON e.event_leader_id = u.user_id
+            LEFT JOIN eventoutcomes eo ON e.event_id = eo.event_id
+            WHERE e.event_id = %s;
+        ''', (event_id,))
+        report = cursor.fetchone()
+
+        if not report:
+            flash('Event not found.', 'danger')
+            return redirect(url_for('event_reports'))
+
+        # Get volunteer list for this event
+        cursor.execute('''
+            SELECT u.full_name, u.email, u.contact_number, er.attendance
+            FROM users u
+            JOIN eventregistrations er ON u.user_id = er.volunteer_id
+            WHERE er.event_id = %s
+            ORDER BY u.full_name;
+        ''', (event_id,))
+        volunteers = cursor.fetchall()
+
+        # Get all feedback for this event
+        cursor.execute('''
+            SELECT f.*, u.full_name as volunteer_name
+            FROM feedback f
+            JOIN users u ON f.volunteer_id = u.user_id
+            WHERE f.event_id = %s
+            ORDER BY f.submitted_at DESC;
+        ''', (event_id,))
+        feedback_list = cursor.fetchall()
+
+    return render_template('admin/event_report_detail.html',
+                         report=report,
+                         volunteers=volunteers,
+                         feedback_list=feedback_list,
+                         event_id=event_id)

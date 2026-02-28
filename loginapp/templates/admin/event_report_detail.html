@@ -1,0 +1,173 @@
+{% extends "userbase.html" %}
+
+{% block title %}Event Report - {{ report.event_name }} - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'event_reports' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Event Report: {{ report.event_name }}</h1>
+            <p class="lead text-muted">Generated on {{ now()|format_datetime }} by Administrator</p>
+        </div>
+    </div>
+
+    <!-- Report Header -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Event Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Event Name:</strong> {{ report.event_name }}</p>
+                    <p><strong>Date:</strong> {{ report.event_date|format_datetime }}</p>
+                    <p><strong>Time:</strong> {{ report.start_time }} - {{ report.end_time }}</p>
+                    <p><strong>Location:</strong> {{ report.location }}</p>
+                    <p><strong>Event Type:</strong> {{ report.event_type or 'Not specified' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Event Leader:</strong> {{ report.leader_name }}</p>
+                    <p><strong>Duration:</strong> {{ report.duration or 'Not specified' }} minutes</p>
+                    <p><strong>Description:</strong> {{ report.description or 'No description' }}</p>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <p><strong>Supplies Provided:</strong> {{ report.supplies or 'None specified' }}</p>
+                    <p><strong>Safety Instructions:</strong> {{ report.safety_instructions or 'None specified' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Summary -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <h3>{{ report.total_registered }}</h3>
+                    <p class="mb-0">Registered</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body text-center">
+                    <h3>{{ report.total_attended }}</h3>
+                    <p class="mb-0">Attended</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body text-center">
+                    <h3>{{ report.bags_collected or 0 }}</h3>
+                    <p class="mb-0">Bags Collected</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body text-center">
+                    <h3>{{ report.recyclables_sorted or 0 }}</h3>
+                    <p class="mb-0">Recyclables</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Outcomes Details -->
+    {% if report.other_achievements %}
+    <div class="card shadow mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-trophy"></i> Other Achievements</h5>
+        </div>
+        <div class="card-body">
+            <p>{{ report.other_achievements }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Feedback Summary -->
+    {% if feedback_list %}
+    <div class="card shadow mb-4">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0"><i class="bi bi-star"></i> Volunteer Feedback ({{ feedback_list|length }})</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>Average Rating:</strong> 
+                        <span class="rating-star">
+                            {{ report.avg_rating or 'N/A' }} ★
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <hr>
+            {% for feedback in feedback_list %}
+                <div class="border-bottom mb-3 pb-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ feedback.volunteer_name }}</strong>
+                        <span class="rating-star">{{ feedback.rating|rating_stars }}</span>
+                    </div>
+                    <p class="mb-1">{{ feedback.comments }}</p>
+                    <small class="text-muted">{{ feedback.submitted_at|format_datetime }}</small>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Volunteer List -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="bi bi-people"></i> Volunteer Attendance ({{ volunteers|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if volunteers %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Contact</th>
+                                <th>Attendance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for volunteer in volunteers %}
+                                <tr>
+                                    <td>{{ volunteer.full_name }}</td>
+                                    <td>{{ volunteer.email }}</td>
+                                    <td>{{ volunteer.contact_number or 'N/A' }}</td>
+                                    <td>
+                                        <span class="badge {% if volunteer.attendance == 'attended' %}bg-success{% elif volunteer.attendance == 'registered' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ volunteer.attendance|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-center text-muted my-3">No volunteers registered for this event.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Print/Export Buttons -->
+    <div class="text-center mt-4">
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="bi bi-printer"></i> Print Report
+        </button>
+        <a href="{{ url_for('event_reports') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Event Reports
+        </a>
+    </div>
+</div>
+{% endblock %}

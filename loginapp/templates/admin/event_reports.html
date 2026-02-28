@@ -71,6 +71,7 @@
                                 <th>Recyclables</th>
                                 <th>Avg Rating</th>
                                 <th>Feedback</th>
+                                <th>Actions</th>  <!-- New column -->
                             </tr>
                         </thead>
                         <tbody>
@@ -91,6 +92,11 @@
                                         {% endif %}
                                     </td>
                                     <td><span class="badge bg-warning">{{ event.feedback_count or 0 }}</span></td>
+                                    <td>
+                                        <a href="{{ url_for('admin_event_report', event_id=event.event_id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-file-text"></i> Generate Report
+                                        </a>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
