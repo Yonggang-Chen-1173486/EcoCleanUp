@@ -356,7 +356,8 @@ def record_outcomes(event_id):
         attended = cursor.fetchone()
         event['attended_count'] = attended['attended_count']
 
-    return render_template('event_leader/record_outcomes.html', event=event)
+    return render_template('event_leader/record_outcomes.html', event=event,
+                         event_id=event_id)
 
 @app.route('/event_leader/participation_history', endpoint='leader_history')
 def leader_history():
