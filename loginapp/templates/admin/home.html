@@ -1,0 +1,173 @@
+{% extends "userbase.html" %}
+
+{% block title %}Admin Home - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'home' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Admin Dashboard</h1>
+            <p class="lead text-muted">Welcome back, {{ session.username }}! Here's your platform overview.</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Total Volunteers</h6>
+                            <h2 class="mb-0">{{ stats.total_volunteers }}</h2>
+                        </div>
+                        <i class="bi bi-people" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Event Leaders</h6>
+                            <h2 class="mb-0">{{ stats.total_leaders }}</h2>
+                        </div>
+                        <i class="bi bi-person-badge" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Total Events</h6>
+                            <h2 class="mb-0">{{ stats.total_events }}</h2>
+                        </div>
+                        <i class="bi bi-calendar-event" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Avg Rating</h6>
+                            <h2 class="mb-0">{{ stats.avg_rating or 'N/A' }}</h2>
+                        </div>
+                        <i class="bi bi-star" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Platform Stats -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Platform Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Upcoming Events
+                            <span class="badge bg-primary rounded-pill">{{ stats.upcoming_events }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Past Events
+                            <span class="badge bg-secondary rounded-pill">{{ stats.past_events }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Registrations
+                            <span class="badge bg-success rounded-pill">{{ stats.total_registrations }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Feedback
+                            <span class="badge bg-info rounded-pill">{{ stats.total_feedback }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Bags Collected
+                            <span class="badge bg-warning rounded-pill">{{ stats.total_bags or 0 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Recyclables Sorted
+                            <span class="badge bg-success rounded-pill">{{ stats.total_recyclables or 0 }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Events -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Events</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_events %}
+                        <div class="list-group">
+                            {% for event in recent_events %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ event.event_name }}</h6>
+                                        <small>{{ event.event_date|format_datetime }}</small>
+                                    </div>
+                                    <p class="mb-1">Leader: {{ event.leader_name }}</p>
+                                    <small class="text-muted">{{ event.registered }} registered</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted my-3">No events found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('manage_users') }}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-people"></i> Manage Users
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('platform_reports') }}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-bar-chart"></i> View Reports
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('event_reports') }}" class="btn btn-outline-info w-100">
+                                <i class="bi bi-file-text"></i> Event Reports
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-person"></i> My Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Access Denied - EcoCleanUp Hub{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('root') }}">
+            <i class="bi bi-tree-fill"></i> EcoCleanUp Hub
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row vh-100 align-items-center justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white text-center">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Access Denied</h4>
+                </div>
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-shield-lock-fill text-danger" style="font-size: 5rem;"></i>
+                    <h3 class="mt-3">You don't have permission to access this page</h3>
+                    <p class="text-muted">Your account isn't authorized to view this page.</p>
+                    <hr>
+                    <div class="mt-4">
+                        <a href="{% if session.role == 'volunteer' %}{{ url_for('volunteer_home') }}{% elif session.role == 'event_leader' %}{{ url_for('event_leader_home') }}{% elif session.role == 'admin' %}{{ url_for('admin_home') }}{% else %}{{ url_for('login') }}{% endif %}" 
+                           class="btn btn-primary">
+                            <i class="bi bi-house-door"></i> Go to Home
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                            <i class="bi bi-box-arrow-right"></i> Log Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

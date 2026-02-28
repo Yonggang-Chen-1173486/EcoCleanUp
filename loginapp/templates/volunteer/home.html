@@ -1,0 +1,154 @@
+{% extends "userbase.html" %}
+
+{% block title %}Volunteer Home - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'home' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Welcome back, {{ session.username }}!</h1>
+            <p class="lead text-muted">Your volunteer dashboard</p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Upcoming Events</h6>
+                            <h2 class="mb-0">{{ upcoming_events|length }}</h2>
+                        </div>
+                        <i class="bi bi-calendar-event" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Events Attended</h6>
+                            <h2 class="mb-0">{{ past_events|length }}</h2>
+                        </div>
+                        <i class="bi bi-check-circle" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Environmental Impact</h6>
+                            <h2 class="mb-0">🌱</h2>
+                        </div>
+                        <i class="bi bi-tree" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Your Upcoming Events</h5>
+        </div>
+        <div class="card-body">
+            {% if upcoming_events %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Location</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Leader</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in upcoming_events %}
+                            <tr>
+                                <td>{{ event.event_name }}</td>
+                                <td>{{ event.location }}</td>
+                                <td>{{ event.event_date|format_datetime }}</td>
+                                <td>{{ event.start_time }} - {{ event.end_time }}</td>
+                                <td><span class="badge bg-info">{{ event.event_type }}</span></td>
+                                <td>{{ event.leader_name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-end">
+                    <a href="{{ url_for('my_events') }}" class="btn btn-outline-primary">View All</a>
+                </div>
+            {% else %}
+                <p class="text-center text-muted my-3">You have no upcoming events. <a href="{{ url_for('browse_events') }}">Browse events</a> to get started!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Participation -->
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Participation</h5>
+        </div>
+        <div class="card-body">
+            {% if past_events %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Date</th>
+                                <th>Attendance</th>
+                                <th>Feedback</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in past_events %}
+                            <tr>
+                                <td>{{ event.event_name }}</td>
+                                <td>{{ event.event_date|format_datetime }}</td>
+                                <td>
+                                    {% if event.attendance == 'attended' %}
+                                        <span class="badge bg-success">Attended</span>
+                                    {% elif event.attendance == 'no_show' %}
+                                        <span class="badge bg-danger">No Show</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if event.feedback_submitted %}
+                                        <span class="badge bg-success">Submitted</span>
+                                    {% elif event.attendance == 'attended' %}
+                                        <a href="{{ url_for('submit_feedback', event_id=event.event_id) }}" 
+                                           class="btn btn-sm btn-outline-primary">Submit Feedback</a>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-end">
+                    <a href="{{ url_for('volunteer_history') }}" class="btn btn-outline-success">View Full History</a>
+                </div>
+            {% else %}
+                <p class="text-center text-muted my-3">No participation history yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

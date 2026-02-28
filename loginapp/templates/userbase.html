@@ -1,0 +1,213 @@
+{# 
+    This is the base template for pages seen by a logged-in user, and provides
+    the top-level navigation menu.
+
+    Page templates based on this one should specify:
+        - A "title" block containing the page title (e.g. "User Profile")
+        - A "content" block containing the main HTML/Jinja content of the page.
+    
+    Each page should also set the "active_page" variable to control which top-
+    level menu item is highlighted as active.
+#}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}{% endblock %} - EcoCleanUp Hub</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <style>
+            :root {
+                --bs-primary: #2e7d32;
+                --bs-primary-rgb: 46, 125, 50;
+            }
+            .btn-primary {
+                background-color: #2e7d32;
+                border-color: #2e7d32;
+            }
+            .btn-primary:hover {
+                background-color: #1b5e20;
+                border-color: #1b5e20;
+            }
+            .navbar-dark.bg-primary {
+                background-color: #1b5e20 !important;
+            }
+            .profile-image {
+                width: 150px;
+                height: 150px;
+                object-fit: cover;
+                border-radius: 50%;
+                border: 3px solid #2e7d32;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('root') }}">
+                    <i class="bi bi-tree-fill"></i> EcoCleanUp Hub
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        {% if session.role == 'volunteer' %}
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'home' }}" href="{{ url_for('volunteer_home') }}">
+                                    <i class="bi bi-house-door-fill"></i> Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'browse' }}" href="{{ url_for('browse_events') }}">
+                                    <i class="bi bi-calendar-event"></i> Browse Events
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'my_events' }}" href="{{ url_for('my_events') }}">
+                                    <i class="bi bi-calendar-check"></i> My Events
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'history' }}" href="{{ url_for('volunteer_history') }}">
+                                    <i class="bi bi-clock-history"></i> History
+                                </a>
+                            </li>
+                        {% elif session.role == 'event_leader' %}
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'home' }}" href="{{ url_for('event_leader_home') }}">
+                                    <i class="bi bi-house-door-fill"></i> Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'manage_events' }}" href="{{ url_for('manage_events') }}">
+                                    <i class="bi bi-calendar-range"></i> My Events
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'create_event' }}" href="{{ url_for('create_event') }}">
+                                    <i class="bi bi-plus-circle"></i> Create Event
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'participation' }}" href="{{ url_for('leader_history') }}">
+                                    <i class="bi bi-people-fill"></i> Volunteers
+                                </a>
+                            </li>
+                        {% elif session.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'home' }}" href="{{ url_for('admin_home') }}">
+                                    <i class="bi bi-house-door-fill"></i> Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                    <a class="nav-link {{ 'active' if active_page == 'events' }}" href="{{ url_for('admin_manage_events') }}">
+                                        <i class="bi bi-calendar-event"></i> Events  <!-- NEW -->
+                                    </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'users' }}" href="{{ url_for('manage_users') }}">
+                                    <i class="bi bi-people-fill"></i> Users
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'reports' }}" href="{{ url_for('platform_reports') }}">
+                                    <i class="bi bi-bar-chart-fill"></i> Reports
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ 'active' if active_page == 'event_reports' }}" href="{{ url_for('event_reports') }}">
+                                    <i class="bi bi-file-text-fill"></i> Event Reports
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <ul class="navbar-nav">
+                        {% if session.has_reminders %}
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="#" data-bs-toggle="modal" data-bs-target="#reminderModal">
+                                <i class="bi bi-bell-fill text-warning"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ session.upcoming_events|length }}
+                                </span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> {{ session.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('change_password') }}"><i class="bi bi-key"></i> Change Password</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Reminder Modal -->
+        {% if session.has_reminders %}
+        <div class="modal fade" id="reminderModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title"><i class="bi bi-bell-fill"></i> Upcoming Event Reminders</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>You have {{ session.upcoming_events|length }} upcoming event(s) in the next 7 days:</p>
+                        <ul class="list-group">
+                            {% for event in session.upcoming_events %}
+                            <li class="list-group-item">
+                                <strong>{{ event.event_name }}</strong><br>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> {{ event.event_date|format_datetime }} 
+                                    <i class="bi bi-clock"></i> {{ event.start_time }} 
+                                    <i class="bi bi-geo-alt"></i> {{ event.location }}
+                                </small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ url_for('dismiss_reminders') }}" class="btn btn-secondary">Dismiss</a>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="container mt-3">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="footer bg-light py-4 mt-5">
+            <div class="container text-center">
+                <p class="text-muted mb-1">EcoCleanUp Hub - Community Cleanup Management System</p>
+                <p class="text-muted mb-1">Student Name: Yonggang Chen | Student ID: 1173486</p>
+                <p class="text-muted small">© 2026 GreenSteps Initiative. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

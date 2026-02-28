@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - EcoCleanUp Hub{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('root') }}">
+            <i class="bi bi-tree-fill"></i> EcoCleanUp Hub
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h4 class="mb-0"><i class="bi bi-person-plus"></i> Create an Account</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if signup_successful %}
+                        <div class="alert alert-success text-center">
+                            <i class="bi bi-check-circle-fill"></i> 
+                            You have successfully signed up! <a href="{{ url_for('login') }}" class="alert-link">Log in</a>
+                        </div>
+                    {% else %}
+                        <form action="{{ url_for('signup') }}" method="post">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control {% if username_error %}is-invalid{% endif %}" 
+                                           id="username" name="username" value="{{ username if username }}" 
+                                           maxlength="50" required>
+                                    {% if username_error %}
+                                        <div class="invalid-feedback">{{ username_error }}</div>
+                                    {% endif %}
+                                    <small class="text-muted">Letters, numbers and underscores only</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="full_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control {% if fullname_error %}is-invalid{% endif %}" 
+                                           id="full_name" name="full_name" value="{{ full_name if full_name }}" 
+                                           maxlength="100" required>
+                                    {% if fullname_error %}
+                                        <div class="invalid-feedback">{{ fullname_error }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control {% if email_error %}is-invalid{% endif %}" 
+                                       id="email" name="email" value="{{ email if email }}" 
+                                       maxlength="100" required>
+                                {% if email_error %}
+                                    <div class="invalid-feedback">{{ email_error }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control {% if password_error %}is-invalid{% endif %}" 
+                                           id="password" name="password" required>
+                                    {% if password_error %}
+                                        <div class="invalid-feedback">{{ password_error }}</div>
+                                    {% endif %}
+                                    <small class="text-muted">
+                                        At least 8 characters with uppercase, lowercase and number
+                                    </small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="confirm_password" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control {% if confirm_error %}is-invalid{% endif %}" 
+                                           id="confirm_password" name="confirm_password" required>
+                                    {% if confirm_error %}
+                                        <div class="invalid-feedback">{{ confirm_error }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="contact_number" class="form-label">Contact Number</label>
+                                <input type="text" class="form-control {% if contact_error %}is-invalid{% endif %}" 
+                                    id="contact_number" name="contact_number" value="{{ contact_number if contact_number }}">
+                                {% if contact_error %}
+                                    <div class="invalid-feedback">{{ contact_error }}</div>
+                                {% endif %}
+                                <small class="text-muted">Only digits, spaces, hyphens, parentheses, and optional + prefix allowed.</small>
+                            </div>
+                                
+                            </div>
+                            <div class="mb-3">
+                                <label for="home_address" class="form-label">Home Address</label>
+                                <textarea class="form-control" id="home_address" name="home_address" rows="2">{{ home_address if home_address }}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="environmental_interests" class="form-label">Environmental Interests</label>
+                                <input type="text" class="form-control" id="environmental_interests" name="environmental_interests" 
+                                       value="{{ environmental_interests if environmental_interests }}" 
+                                       placeholder="e.g., Beach cleanups, Tree planting, Recycling">
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle-fill"></i>
+                                By signing up, you agree to become a volunteer. Event leader and admin accounts are created separately.
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-person-plus"></i> Sign Up
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center py-3 bg-light">
+                    <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-primary">Log in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "userbase.html" %}
+
+{% block title %}Event Reports - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'event_reports' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Event Reports</h1>
+            <p class="lead text-muted">View and filter all events across the platform</p>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-funnel"></i> Filter Events</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{{ url_for('event_reports') }}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="from_date" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="from_date" name="from_date" value="{{ from_date }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="to_date" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="to_date" name="to_date" value="{{ to_date }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="leader_id" class="form-label">Event Leader</label>
+                    <select class="form-select" id="leader_id" name="leader_id">
+                        <option value="">All Leaders</option>
+                        {% for leader in leaders %}
+                            <option value="{{ leader.user_id }}" {% if selected_leader == leader.user_id|string %}selected{% endif %}>
+                                {{ leader.full_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-search"></i> Apply
+                    </button>
+                    <a href="{{ url_for('event_reports') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Events List -->
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Events ({{ events|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if events %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Date</th>
+                                <th>Leader</th>
+                                <th>Registered</th>
+                                <th>Attended</th>
+                                <th>Bags</th>
+                                <th>Recyclables</th>
+                                <th>Avg Rating</th>
+                                <th>Feedback</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                                <tr>
+                                    <td>{{ event.event_name }}</td>
+                                    <td>{{ event.event_date|format_datetime }}</td>
+                                    <td>{{ event.leader_name }}</td>
+                                    <td><span class="badge bg-info">{{ event.registered }}</span></td>
+                                    <td><span class="badge bg-success">{{ event.attended or 0 }}</span></td>
+                                    <td>{{ event.bags_collected or 0 }}</td>
+                                    <td>{{ event.recyclables_sorted or 0 }}</td>
+                                    <td>
+                                        {% if event.avg_rating %}
+                                            <span class="rating-star">{{ event.avg_rating|rating_stars }}</span>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td><span class="badge bg-warning">{{ event.feedback_count or 0 }}</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summary Row -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <strong>Total Events:</strong> {{ events|length }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Total Registrations:</strong> 
+                                        {{ events|sum(attribute='registered') }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Total Attendees:</strong> 
+                                        {{ events|sum(attribute='attended') }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Total Bags:</strong> 
+                                        {{ events|sum(attribute='bags_collected') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center text-muted my-3">No events found matching your criteria.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

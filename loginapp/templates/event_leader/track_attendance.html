@@ -1,0 +1,74 @@
+{% extends "userbase.html" %}
+
+{% block title %}Track Attendance - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'manage_events' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-check-circle"></i> Track Attendance: {{ event.event_name }}</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">
+                        <i class="bi bi-calendar"></i> {{ event.event_date|format_datetime }} 
+                        <i class="bi bi-clock ms-3"></i> {{ event.start_time }} - {{ event.end_time }}
+                    </p>
+
+                    <form action="{{ url_for('track_attendance', event_id=event.event_id) }}" method="post">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Volunteer</th>
+                                        <th>Email</th>
+                                        <th>Attendance Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for volunteer in volunteers %}
+                                        <tr>
+                                            <td>{{ volunteer.full_name }}</td>
+                                            <td>{{ volunteer.email }}</td>
+                                            <td>
+                                                <select class="form-select form-select-sm" name="attendance">
+                                                    <option value="{{ volunteer.user_id }}:registered" 
+                                                            {% if volunteer.attendance == 'registered' %}selected{% endif %}>
+                                                        Registered (Not Yet Attended)
+                                                    </option>
+                                                    <option value="{{ volunteer.user_id }}:attended"
+                                                            {% if volunteer.attendance == 'attended' %}selected{% endif %}>
+                                                        Attended ✓
+                                                    </option>
+                                                    <option value="{{ volunteer.user_id }}:no_show"
+                                                            {% if volunteer.attendance == 'no_show' %}selected{% endif %}>
+                                                        No Show ✗
+                                                    </option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('event_details', event_id=event.event_id) }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Attendance
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

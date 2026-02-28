@@ -1,0 +1,210 @@
+{% extends "userbase.html" %}
+
+{% block title %}Platform Reports - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'reports' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Platform Reports</h1>
+            <p class="lead text-muted">Overview statistics and analytics</p>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h6 class="card-title">Active Volunteers</h6>
+                    <h2>{{ summary.active_volunteers }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h6 class="card-title">Active Leaders</h6>
+                    <h2>{{ summary.active_leaders }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h6 class="card-title">Upcoming Events</h6>
+                    <h2>{{ summary.upcoming_events }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h6 class="card-title">Completed Events</h6>
+                    <h2>{{ summary.completed_events }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Feedback Statistics -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-star"></i> Feedback Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h3>{{ summary.total_feedback }}</h3>
+                        <p class="text-muted">Total Feedback Submissions</p>
+                    </div>
+                    <div class="text-center">
+                        <h3>{{ summary.avg_rating or 'N/A' }} / 5</h3>
+                        <p class="text-muted">Average Rating</p>
+                        <div class="rating-star" style="font-size: 2rem;">
+                            {% if summary.avg_rating %}
+                                {{ summary.avg_rating|rating_stars }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impact Statistics -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-tree"></i> Environmental Impact</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h3>{{ summary.total_bags }}</h3>
+                            <p class="text-muted">Bags Collected</p>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h3>{{ summary.total_recyclables }}</h3>
+                            <p class="text-muted">Recyclables Sorted</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Events by Month -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar-month"></i> Events by Month</h5>
+                </div>
+                <div class="card-body">
+                    {% if events_by_month %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Total</th>
+                                        <th>Completed</th>
+                                        <th>Upcoming</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for month in events_by_month %}
+                                        <tr>
+                                            <td>{{ month.month }}</td>
+                                            <td>{{ month.event_count }}</td>
+                                            <td><span class="badge bg-success">{{ month.completed }}</span></td>
+                                            <td><span class="badge bg-primary">{{ month.upcoming }}</span></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">No event data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Types Distribution -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Event Types</h5>
+                </div>
+                <div class="card-body">
+                    {% if event_types %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Event Type</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for type in event_types %}
+                                        <tr>
+                                            <td>{{ type.event_type }}</td>
+                                            <td><span class="badge bg-info">{{ type.count }}</span></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">No event type data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Event Leaders -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-trophy"></i> Top Event Leaders</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_leaders %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Leader</th>
+                                        <th>Events Created</th>
+                                        <th>Unique Volunteers</th>
+                                        <th>Total Bags</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for leader in top_leaders %}
+                                        <tr>
+                                            <td>{{ leader.full_name }}</td>
+                                            <td><span class="badge bg-primary">{{ leader.events_created }}</span></td>
+                                            <td><span class="badge bg-success">{{ leader.unique_volunteers or 0 }}</span></td>
+                                            <td><span class="badge bg-info">{{ leader.total_bags }}</span></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">No leader data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

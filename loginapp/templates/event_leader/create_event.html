@@ -1,0 +1,89 @@
+{% extends "userbase.html" %}
+
+{% block title %}Create Event - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'create_event' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Create New Cleanup Event</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('create_event') }}" method="post">
+                        <div class="mb-3">
+                            <label for="event_name" class="form-label">Event Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="event_name" name="event_name" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="event_type" class="form-label">Event Type</label>
+                                <input type="text" class="form-control" id="event_type" name="event_type" 
+                                       placeholder="e.g., Beach Cleanup, Park Cleanup">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="duration" class="form-label">Duration (minutes)</label>
+                                <input type="number" class="form-control" id="duration" name="duration">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="location" name="location" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="event_date" class="form-label">Event Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="event_date" name="event_date" 
+                                       min="{{ now().strftime('%Y-%m-%d') }}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="start_time" class="form-label">Start Time</label>
+                                <input type="time" class="form-control" id="start_time" name="start_time">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="end_time" class="form-label">End Time</label>
+                                <input type="time" class="form-control" id="end_time" name="end_time">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" 
+                                      placeholder="Describe the event activities..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="supplies" class="form-label">Supplies Provided</label>
+                            <textarea class="form-control" id="supplies" name="supplies" rows="2" 
+                                      placeholder="List supplies that will be provided..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="safety_instructions" class="form-label">Safety Instructions</label>
+                            <textarea class="form-control" id="safety_instructions" name="safety_instructions" rows="2" 
+                                      placeholder="Important safety information..."></textarea>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('manage_events') }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Create Event
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

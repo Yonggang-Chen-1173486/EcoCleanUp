@@ -1,0 +1,145 @@
+{% extends "userbase.html" %}
+
+{% block title %}Manage Events - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'events' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Manage Events</h1>
+            <p class="lead text-muted">View, edit, or cancel all events on the platform</p>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-funnel"></i> Filter Events</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{{ url_for('admin_manage_events') }}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Search</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           placeholder="Event name, location, or leader..." value="{{ search }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">All Events</option>
+                        <option value="upcoming" {% if status_filter == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                        <option value="past" {% if status_filter == 'past' %}selected{% endif %}>Past</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="leader_id" class="form-label">Event Leader</label>
+                    <select class="form-select" id="leader_id" name="leader_id">
+                        <option value="">All Leaders</option>
+                        {% for leader in leaders %}
+                            <option value="{{ leader.user_id }}" {% if leader_filter == leader.user_id|string %}selected{% endif %}>
+                                {{ leader.full_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-search"></i> Apply
+                    </button>
+                    <a href="{{ url_for('admin_manage_events') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Events List -->
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Events ({{ events|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if events %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Leader</th>
+                                <th>Registered</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                                <tr>
+                                    <td>{{ event.event_name }}</td>
+                                    <td>{{ event.event_date|format_datetime }}</td>
+                                    <td>{{ event.location }}</td>
+                                    <td>{{ event.leader_name }}</td>
+                                    <td><span class="badge bg-info">{{ event.registered_count }}</span></td>
+                                    <td>
+                                        {% if event.status == 'upcoming' %}
+                                            <span class="badge bg-primary">Upcoming</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Past</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('admin_view_event', event_id=event.event_id) }}" 
+                                               class="btn btn-sm btn-outline-primary" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            {% if event.status == 'upcoming' %}
+                                                <a href="{{ url_for('admin_edit_event', event_id=event.event_id) }}" 
+                                                   class="btn btn-sm btn-outline-success" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        data-bs-toggle="modal" data-bs-target="#cancelModal{{ event.event_id }}" title="Cancel">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Cancel Modal -->
+                                        <div class="modal fade" id="cancelModal{{ event.event_id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-danger text-white">
+                                                        <h5 class="modal-title">Cancel Event</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to cancel <strong>{{ event.event_name }}</strong>?</p>
+                                                        <p class="text-danger"><small>This action cannot be undone. All volunteer registrations will be removed.</small></p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Event</button>
+                                                        <form action="{{ url_for('admin_cancel_event', event_id=event.event_id) }}" method="post" class="d-inline">
+                                                            <button type="submit" class="btn btn-danger">Yes, Cancel Event</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-center text-muted my-3">No events found matching your criteria.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "userbase.html" %}
+
+{% block title %}Edit Event - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'events' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-pencil"></i> Edit Event: {{ event.event_name }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Event Leader:</strong> {{ event.leader_name }}
+                    </div>
+
+                    <form action="{{ url_for('admin_edit_event', event_id=event.event_id) }}" method="post">
+                        <div class="mb-3">
+                            <label for="event_name" class="form-label">Event Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="event_name" name="event_name" 
+                                   value="{{ event.event_name }}" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="event_type" class="form-label">Event Type</label>
+                                <input type="text" class="form-control" id="event_type" name="event_type" 
+                                       value="{{ event.event_type or '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="duration" class="form-label">Duration (minutes)</label>
+                                <input type="number" class="form-control" id="duration" name="duration" 
+                                       value="{{ event.duration or '' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   value="{{ event.location }}" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="event_date" class="form-label">Event Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="event_date" name="event_date" 
+                                       value="{{ event.event_date }}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="start_time" class="form-label">Start Time</label>
+                                <input type="time" class="form-control" id="start_time" name="start_time" 
+                                       value="{{ event.start_time or '' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="end_time" class="form-label">End Time</label>
+                                <input type="time" class="form-control" id="end_time" name="end_time" 
+                                       value="{{ event.end_time or '' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ event.description or '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="supplies" class="form-label">Supplies Provided</label>
+                            <textarea class="form-control" id="supplies" name="supplies" rows="2">{{ event.supplies or '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="safety_instructions" class="form-label">Safety Instructions</label>
+                            <textarea class="form-control" id="safety_instructions" name="safety_instructions" rows="2">{{ event.safety_instructions or '' }}</textarea>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin_manage_events') }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Events
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

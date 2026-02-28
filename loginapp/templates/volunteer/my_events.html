@@ -1,0 +1,109 @@
+{% extends "userbase.html" %}
+
+{% block title %}My Events - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'my_events' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>My Upcoming Events</h1>
+            <p class="lead text-muted">Events you have registered for</p>
+        </div>
+    </div>
+
+    {% if upcoming_events %}
+        <div class="row">
+            {% for event in upcoming_events %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 event-card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">{{ event.event_name }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <i class="bi bi-calendar"></i> <strong>Date:</strong> {{ event.event_date|format_datetime }}<br>
+                                <i class="bi bi-clock"></i> <strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}<br>
+                                <i class="bi bi-geo-alt"></i> <strong>Location:</strong> {{ event.location }}<br>
+                                <i class="bi bi-person"></i> <strong>Event Leader:</strong> {{ event.leader_name }}
+                            </p>
+                            
+                            <p class="card-text">{{ event.description }}</p>
+                            
+                            <div class="mb-2">
+                                <span class="badge bg-info">{{ event.event_type }}</span>
+                                <span class="badge bg-secondary">{{ event.duration }} minutes</span>
+                            </div>
+
+                            {% if event.supplies %}
+                                <div class="alert alert-light">
+                                    <strong>Supplies provided:</strong> {{ event.supplies }}
+                                </div>
+                            {% endif %}
+                            
+                            {% if event.safety_instructions %}
+                                <div class="alert alert-warning">
+                                    <strong>Safety instructions:</strong> {{ event.safety_instructions }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-grid">
+                                <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#eventModal{{ event.event_id }}">
+                                    <i class="bi bi-info-circle"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Details Modal -->
+                <div class="modal fade" id="eventModal{{ event.event_id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">{{ event.event_name }}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Date:</strong> {{ event.event_date|format_datetime }}</p>
+                                        <p><strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}</p>
+                                        <p><strong>Location:</strong> {{ event.location }}</p>
+                                        <p><strong>Event Type:</strong> {{ event.event_type }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Event Leader:</strong> {{ event.leader_name }}</p>
+                                        <p><strong>Duration:</strong> {{ event.duration }} minutes</p>
+                                        <p><strong>Description:</strong> {{ event.description }}</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p><strong>Supplies provided:</strong> {{ event.supplies }}</p>
+                                        <p><strong>Safety instructions:</strong> {{ event.safety_instructions }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> You haven't registered for any upcoming events yet.
+            <hr>
+            <a href="{{ url_for('browse_events') }}" class="btn btn-primary">
+                <i class="bi bi-calendar-plus"></i> Browse Events
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

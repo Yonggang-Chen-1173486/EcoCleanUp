@@ -1,0 +1,113 @@
+{% extends "userbase.html" %}
+
+{% block title %}Browse Events - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'browse' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Browse Cleanup Events</h1>
+            <p class="lead text-muted">Find and register for upcoming community cleanup events</p>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-funnel"></i> Filter Events</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{{ url_for('browse_events') }}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="date" name="date" value="{{ date_filter }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" 
+                           placeholder="Search location..." value="{{ location_filter }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="type" class="form-label">Event Type</label>
+                    <select class="form-select" id="type" name="type">
+                        <option value="">All Types</option>
+                        {% for type in event_types %}
+                            <option value="{{ type.event_type }}" {% if type_filter == type.event_type %}selected{% endif %}>
+                                {{ type.event_type }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-search"></i> Apply Filters
+                    </button>
+                    <a href="{{ url_for('browse_events') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Events List -->
+    <div class="row">
+        {% if events %}
+            {% for event in events %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 event-card">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">{{ event.event_name }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> {{ event.event_date|format_datetime }}<br>
+                                    <i class="bi bi-clock"></i> {{ event.start_time }} - {{ event.end_time }}<br>
+                                    <i class="bi bi-geo-alt"></i> {{ event.location }}<br>
+                                    <i class="bi bi-person"></i> Led by: {{ event.leader_name }}
+                                </small>
+                            </p>
+                            <p class="card-text">{{ event.description|truncate(100) }}</p>
+                            
+                            <div class="mb-2">
+                                <span class="badge bg-info">{{ event.event_type }}</span>
+                                <span class="badge bg-secondary">{{ event.duration }} mins</span>
+                            </div>
+
+                            {% if event.supplies %}
+                                <p class="mb-1"><small><strong>Supplies:</strong> {{ event.supplies }}</small></p>
+                            {% endif %}
+                            
+                            {% if event.safety_instructions %}
+                                <p class="mb-0"><small><strong>Safety:</strong> {{ event.safety_instructions|truncate(50) }}</small></p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            {% if event.registered %}
+                                <button class="btn btn-success w-100" disabled>
+                                    <i class="bi bi-check-circle"></i> Already Registered
+                                </button>
+                            {% else %}
+                                <form action="{{ url_for('register_for_event', event_id=event.event_id) }}" method="post">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-calendar-plus"></i> Register
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> No events found matching your criteria.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

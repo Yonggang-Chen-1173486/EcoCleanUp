@@ -1,0 +1,240 @@
+{% extends "userbase.html" %}
+
+{% block title %}Event Details - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'manage_events' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>{{ event.event_name }}</h1>
+            <p class="lead text-muted">Event details and management</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Event Information -->
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Event Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Date:</strong> {{ event.event_date|format_datetime }}</p>
+                            <p><strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}</p>
+                            <p><strong>Location:</strong> {{ event.location }}</p>
+                            <p><strong>Type:</strong> {{ event.event_type or 'Not specified' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Duration:</strong> {{ event.duration or 'Not specified' }} minutes</p>
+                            <p><strong>Registered Volunteers:</strong> {{ event.registered_count }}</p>
+                            <p><strong>Attendance:</strong> {{ event.attended_count }}</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6>Description</h6>
+                    <p>{{ event.description or 'No description provided.' }}</p>
+                    
+                    <h6>Supplies Provided</h6>
+                    <p>{{ event.supplies or 'No supplies specified.' }}</p>
+                    
+                    <h6>Safety Instructions</h6>
+                    <p>{{ event.safety_instructions or 'No safety instructions provided.' }}</p>
+                </div>
+            </div>
+
+            <!-- Registered Volunteers -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Registered Volunteers ({{ volunteers|length }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if volunteers %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Contact</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for volunteer in volunteers %}
+                                        <tr>
+                                            <td>{{ volunteer.full_name }}</td>
+                                            <td>{{ volunteer.email }}</td>
+                                            <td>{{ volunteer.contact_number or 'N/A' }}</td>
+                                            <td>
+                                                <span class="badge {% if volunteer.attendance == 'attended' %}bg-success{% elif volunteer.attendance == 'no_show' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                    {{ volunteer.attendance|title }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        data-bs-toggle="modal" data-bs-target="#removeModal{{ volunteer.user_id }}">
+                                                    <i class="bi bi-person-x"></i> Remove
+                                                </button>
+
+                                                <!-- Remove Modal -->
+                                                <div class="modal fade" id="removeModal{{ volunteer.user_id }}" tabindex="-1">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-danger text-white">
+                                                                <h5 class="modal-title">Remove Volunteer</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>Are you sure you want to remove <strong>{{ volunteer.full_name }}</strong> from this event?</p>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                <form action="{{ url_for('remove_volunteer', event_id=event.event_id, volunteer_id=volunteer.user_id) }}" method="post" class="d-inline">
+                                                                    <button type="submit" class="btn btn-danger">Remove</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted my-3">No volunteers registered yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Event Outcomes (for past events) -->
+            {% if event.event_date < now() %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Event Outcomes</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if outcomes %}
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h3>{{ outcomes.num_attendees }}</h3>
+                                            <p class="mb-0">Attendees</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h3>{{ outcomes.bags_collected }}</h3>
+                                            <p class="mb-0">Bags Collected</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h3>{{ outcomes.recyclables_sorted }}</h3>
+                                            <p class="mb-0">Recyclables Sorted</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if outcomes.other_achievements %}
+                                <div class="mt-3">
+                                    <strong>Other Achievements:</strong>
+                                    <p>{{ outcomes.other_achievements }}</p>
+                                </div>
+                            {% endif %}
+                            <p class="text-muted small mt-2">Recorded by: {{ outcomes.recorded_by }}</p>
+                        {% else %}
+                            <p class="text-center text-muted my-3">
+                                Outcomes not recorded yet.
+                                <a href="{{ url_for('record_outcomes', event_id=event.event_id) }}" class="btn btn-primary btn-sm ms-2">
+                                    <i class="bi bi-plus-circle"></i> Record Outcomes
+                                </a>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Feedback (for past events) -->
+                {% if feedback_list %}
+                    <div class="card shadow">
+                        <div class="card-header bg-warning">
+                            <h5 class="mb-0"><i class="bi bi-star"></i> Volunteer Feedback</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for feedback in feedback_list %}
+                                <div class="border-bottom mb-3 pb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>{{ feedback.volunteer_name }}</strong>
+                                        <span class="rating-star">{{ feedback.rating|rating_stars }}</span>
+                                    </div>
+                                    <p class="mb-1">{{ feedback.comments }}</p>
+                                    <small class="text-muted">{{ feedback.submitted_at|format_datetime }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Actions Sidebar -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if event.event_date >= now() %}
+                            <a href="{{ url_for('edit_event', event_id=event.event_id) }}" class="btn btn-primary">
+                                <i class="bi bi-pencil"></i> Edit Event
+                            </a>
+                            <a href="{{ url_for('track_attendance', event_id=event.event_id) }}" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Track Attendance
+                            </a>
+                            <form action="{{ url_for('send_reminder', event_id=event.event_id) }}" method="post">
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="bi bi-bell"></i> Send Reminder
+                                </button>
+                            </form>
+                        {% endif %}
+                        
+                        {% if event.event_date < now() and not outcomes %}
+                            <a href="{{ url_for('record_outcomes', event_id=event.event_id) }}" class="btn btn-info">
+                                <i class="bi bi-bar-chart"></i> Record Outcomes
+                            </a>
+                        {% endif %}
+                        
+                        {% if feedback_list %}
+                            <a href="{{ url_for('review_feedback', event_id=event.event_id) }}" class="btn btn-secondary">
+                                <i class="bi bi-star"></i> Review Feedback
+                            </a>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('event_report', event_id=event.event_id) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-file-text"></i> Generate Report
+                        </a>
+                        
+                        <a href="{{ url_for('manage_events') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "userbase.html" %}
+
+{% block title %}Record Outcomes - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'manage_events' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="bi bi-bar-chart"></i> Record Event Outcomes: {{ event.event_name }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <i class="bi bi-people"></i> <strong>Volunteers who attended:</strong> {{ event.attended_count }}
+                    </div>
+
+                    <form action="{{ url_for('record_outcomes', event_id=event.event_id) }}" method="post">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="num_attendees" class="form-label">Number of Attendees <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="num_attendees" name="num_attendees" 
+                                       value="{{ event.attended_count }}" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="bags_collected" class="form-label">Bags Collected</label>
+                                <input type="number" class="form-control" id="bags_collected" name="bags_collected" 
+                                       value="{{ event.bags_collected or 0 }}" min="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="recyclables_sorted" class="form-label">Recyclables Sorted</label>
+                                <input type="number" class="form-control" id="recyclables_sorted" name="recyclables_sorted" 
+                                       value="{{ event.recyclables_sorted or 0 }}" min="0">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="other_achievements" class="form-label">Other Achievements</label>
+                            <textarea class="form-control" id="other_achievements" name="other_achievements" rows="3" 
+                                      placeholder="e.g., Removed large debris, planted native species, etc.">{{ event.other_achievements or '' }}</textarea>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('event_details', event_id=event.event_id) }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Outcomes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

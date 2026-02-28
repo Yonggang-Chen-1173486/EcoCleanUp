@@ -1,0 +1,104 @@
+{% extends "userbase.html" %}
+
+{% block title %}Participation History - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'history' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>My Participation History</h1>
+            <p class="lead text-muted">Events you have attended and your contributions</p>
+        </div>
+    </div>
+
+    {% if past_events %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Attendance</th>
+                        <th>Bags Collected</th>
+                        <th>Recyclables</th>
+                        <th>Rating</th>
+                        <th>Feedback</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in past_events %}
+                        <tr>
+                            <td>{{ event.event_name }}</td>
+                            <td>{{ event.event_date|format_datetime }}</td>
+                            <td>{{ event.location }}</td>
+                            <td>
+                                {% if event.attendance == 'attended' %}
+                                    <span class="badge bg-success">Attended</span>
+                                {% else %}
+                                    <span class="badge bg-danger">No Show</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ event.bags_collected or 0 }}</td>
+                            <td>{{ event.recyclables_sorted or 0 }}</td>
+                            <td>
+                                {% if event.rating %}
+                                    <span class="rating-star">{{ event.rating|rating_stars }}</span>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if event.attendance == 'attended' %}
+                                    {% if not event.feedback_date %}
+                                        <a href="{{ url_for('submit_feedback', event_id=event.event_id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-star"></i> Leave Feedback
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-outline-success" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#feedbackModal{{ event.event_id }}">
+                                            <i class="bi bi-check-circle"></i> View
+                                        </button>
+
+                                        <!-- Feedback Modal -->
+                                        <div class="modal fade" id="feedbackModal{{ event.event_id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-success text-white">
+                                                        <h5 class="modal-title">Your Feedback - {{ event.event_name }}</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p><strong>Rating:</strong> <span class="rating-star">{{ event.rating|rating_stars }}</span></p>
+                                                        <p><strong>Comments:</strong></p>
+                                                        <p class="border p-3 bg-light">{{ event.comments }}</p>
+                                                        <p><small class="text-muted">Submitted: {{ event.feedback_date|format_datetime }}</small></p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">Not applicable</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> No participation history yet. 
+            <a href="{{ url_for('browse_events') }}">Join an event</a> to get started!
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

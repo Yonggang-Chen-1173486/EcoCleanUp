@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Login - EcoCleanUp Hub{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('root') }}">
+            <i class="bi bi-tree-fill"></i> EcoCleanUp Hub
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row vh-100 align-items-center justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h4 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Log In</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('login') }}" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control {% if username_invalid or account_inactive %}is-invalid{% endif %}" 
+                                       id="username" name="username" placeholder="Enter your username" 
+                                       value="{{ username if username else '' }}" maxlength="50" required>
+                            </div>
+                            {% if username_invalid %}
+                                <div class="invalid-feedback d-block">Username not found</div>
+                            {% endif %}
+                            {% if account_inactive %}
+                                <div class="invalid-feedback d-block">Your account is inactive. Please contact an administrator.</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" class="form-control {% if password_invalid %}is-invalid{% endif %}" 
+                                       id="password" name="password" placeholder="Enter your password" required>
+                            </div>
+                            {% if password_invalid %}
+                                <div class="invalid-feedback d-block">Incorrect password</div>
+                            {% endif %}
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Log In
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3 bg-light">
+                    <p class="mb-0">Don't have an account? <a href="{{ url_for('signup') }}" class="text-primary">Sign Up</a></p>
+                </div>
+            </div>
+            
+            <!-- Test credentials info -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle"></i> Test Accounts
+                </div>
+                <div class="card-body small">
+                    <p><strong>Volunteers:</strong> username: emily_wilson / password: Volunteer123!</p>
+                    <p><strong>Event Leaders:</strong> username: rachel_green / password: Leader123!</p>
+                    <p><strong>Admins:</strong> username: admin_smith / password: Admin123!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

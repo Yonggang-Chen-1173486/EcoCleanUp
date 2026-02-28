@@ -1,0 +1,67 @@
+{% extends "userbase.html" %}
+
+{% block title %}Review Feedback - EcoCleanUp Hub{% endblock %}
+
+{% set active_page = 'manage_events' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Feedback: {{ event.event_name }}</h1>
+            <p class="lead text-muted">{{ event.event_date|format_datetime }}</p>
+        </div>
+    </div>
+
+    {% if feedback_list %}
+        <div class="row">
+            {% for feedback in feedback_list %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>{{ feedback.volunteer_name }}</strong>
+                                <span class="rating-star">{{ feedback.rating|rating_stars }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ feedback.comments }}</p>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <small>Submitted: {{ feedback.submitted_at|format_datetime }}</small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Summary -->
+        <div class="card mt-4 bg-light">
+            <div class="card-body">
+                <h5>Feedback Summary</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Total Responses:</strong> {{ feedback_list|length }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Average Rating:</strong> 
+                        <span class="rating-star">
+                            {{ (feedback_list|sum(attribute='rating') / feedback_list|length)|round(1) }} ★
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> No feedback has been submitted for this event yet.
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('event_details', event_id=event.event_id) }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Event
+        </a>
+    </div>
+</div>
+{% endblock %}
