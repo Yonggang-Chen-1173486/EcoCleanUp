@@ -12,7 +12,7 @@ Anyone who registers via the app will be default to **Volunteer**.
 Creating new accounts for **Event Leader** or **Admin** would require direct database population with INSERT function in PostgreSQL.
 
 
-## Authorship Statement
+## GenAI Usage Acknowledgement 
 
 I used AI (DeepSeek, Github Copilot) assistance for:
 - Code structure suggestions
