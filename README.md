@@ -1,5 +1,6 @@
-# EcoCleanUp Hub
+# EcoCleanUp
 
+<<<<<<< HEAD
 EcoCleanUp Hub is a web-based community cleanup management system developed for the GreenSteps Initiative. 
 The platform connects volunteers with local cleanup events, helps event leaders coordinate activities, and provides administrators with oversight and reporting tools.
 
@@ -100,3 +101,6 @@ You should also be able to use the account details provided in the submitted Exc
 
 Users' passwords are not stored directly in our users table in the PostgreSQL database. Instead, we use the Flask-Bcrypt library to bundle a Bcrypt version number, users' password hash with a randomly generared salt value. Then this will be stored in our users table as a hash password to protect. The script below was used in our project to generate the hashed passwords for all users.
 - [Python script to create password hashes](password_hash_generator.py)
+=======
+testing
+>>>>>>> parent of 43a9334 (Added details for README file)
