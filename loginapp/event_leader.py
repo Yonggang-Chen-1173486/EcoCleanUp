@@ -462,7 +462,7 @@ def review_feedback(event_id):
         event = cursor.fetchone()
 
     return render_template('event_leader/review_feedback.html',
-                         feedback_list=feedback_list, event=event)
+                         feedback_list=feedback_list, event=event, event_id=event_id)
 
 @app.route('/event_leader/event_report/<int:event_id>', endpoint='event_report')
 def event_report(event_id):
